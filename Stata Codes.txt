@@ -1,0 +1,115 @@
+**Basic Analysis
+
+summarize vio mur rob incarc_rate pb1064 pw1064 pm1029 pop avginc density shall
+xtset stateid year
+xtsum vio mur rob incarc_rate pb1064 pw1064 pm1029 pop avginc density shall
+corr vio mur rob incarc_rate pb1064 pw1064 pm1029 pop avginc density shall
+
+**Dummy variables for time
+
+summarize i.year
+testparm i.year
+
+*Log variables
+
+histogram vio
+gen log_vio = log(vio)
+histogram log_vio
+histogram mur
+gen log_mur = log(mur)
+histogram log_mur
+histogram rob
+gen log_rob = log(rob)
+histogram log_rob
+histogram pop
+gen log_pop = log(pop)
+histogram log_pop
+histogram density
+gen log_density = log(density)
+histogram log_density
+histogram incarc_rate
+gen log_incrate = log(incarc_rate)
+histogram log_incrate
+
+**Violent Crime Rate
+
+*Pooled OLS
+reg vio incarc_rate pb1064 pw1064 pm1029 pop avginc density i.shall
+reg vio incarc_rate pb1064 pw1064 pm1029 pop avginc density i.shall, robust
+
+*Random Effects Model
+xtreg vio incarc_rate pb1064 pw1064 pm1029 pop avginc density i.shall, re
+estimates store random
+
+*Fixed-Effects Model
+xtreg vio incarc_rate pb1064 pw1064 pm1029 pop avginc density i.shall, fe
+estimates store fixed
+
+*Hausman Test
+hausman fixed random
+
+*Robust Standard Errors
+xtreg vio incarc_rate pb1064 pw1064 pm1029 pop avginc density i.shall, fe vce(cluster stateid)
+xtreg log_vio log_incrate pb1064 pw1064 pm1029 log_pop avginc density i.shall, fe vce(cluster stateid)
+
+*Dummy variables for time
+xtreg log_vio log_incrate pb1064 pw1064 pm1029 log_pop avginc density i.shall i.year, fe vce(cluster stateid)
+
+*Interaction Variables
+xtreg log_vio pw1064 avginc pm1029 log_pop c.log_incrate density i.shall##c.pb1064 i.year, fe vce(cluster stateid)
+ereturn list
+
+**Murder Rate
+
+*Pooled OLS
+reg mur incarc_rate pb1064 pw1064 pm1029 pop avginc density i.shall
+reg mur incarc_rate pb1064 pw1064 pm1029 pop avginc density i.shall, robust
+
+*Random Effects Model
+xtreg mur incarc_rate pb1064 pw1064 pm1029 pop avginc density i.shall, re
+estimates store random2
+
+*Fixed-Effects Model
+xtreg mur incarc_rate pb1064 pw1064 pm1029 pop avginc density i.shall, fe
+estimates store fixed2
+
+*Hausman Test
+hausman fixed2 random2
+
+*Robust Standard Errors
+xtreg mur incarc_rate pb1064 pw1064 pm1029 pop avginc density i.shall, fe vce(cluster stateid)
+xtreg mur incarc_rate pb1064 pw1064 pm1029 log_pop avginc log_density i.shall, fe vce(cluster stateid)
+
+*Dummy variables for time
+xtreg mur incarc_rate pb1064 pw1064 pm1029 log_pop avginc log_density i.shall i.year, fe vce(cluster stateid)
+
+*Interaction Variables
+xtreg mur pw1064 pm1029 c.log_pop##c.incarc_rate avginc c.log_density##c.pb1064 i.shall i.year, fe vce(cluster stateid)
+ereturn list
+
+**Robbery Rate
+
+*Pooled OLS
+reg rob incarc_rate pb1064 pw1064 pm1029 pop avginc density i.shall
+reg rob incarc_rate pb1064 pw1064 pm1029 pop avginc density i.shall, robust
+
+*Random Effects Model
+xtreg rob incarc_rate pb1064 pw1064 pm1029 pop avginc density i.shall, re
+estimates store random3
+
+*Fixed-Effects Model
+xtreg rob incarc_rate pb1064 pw1064 pm1029 pop avginc density i.shall, fe
+estimates store fixed3
+
+*Hausman Test
+hausman fixed3 random3
+
+*Robust Standard Errors
+xtreg rob incarc_rate pb1064 pw1064 pm1029 pop avginc density i.shall, fe vce(cluster stateid)
+
+*Dummy variables for time
+xtreg rob incarc_rate pb1064 pw1064 pm1029 pop avginc density i.shall i.year, fe vce(cluster stateid)
+
+*Interaction Variables
+xtreg rob pw1064 pm1029 c.pop##c.pb1064 c.avginc##c.density c.density#c.density i.shall incarc_rate c.incarc_rate#c.pb1064 i.year, fe vce(cluster stateid)
+ereturn list
